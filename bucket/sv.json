@@ -10,7 +10,13 @@
             "extract_dir": "sv-0.1.0-windows-x86_64"
         }
     },
-    "bin": "sv.exe",
+    "bin": [
+        "sv.exe",
+        [
+            "sv.exe",
+            "stackvet"
+        ]
+    ],
     "checkver": {
         "url": "https://api.github.com/repos/abbyshade111/StackVet/releases/latest",
         "jsonpath": "$.tag_name",

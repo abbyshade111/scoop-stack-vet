@@ -12,11 +12,13 @@ In PowerShell:
 ```powershell
 scoop bucket add stackvet https://github.com/abbyshade111/scoop-stack-vet
 scoop install stackvet/sv
-sv.exe --version
+stackvet --version
 ```
 
-**In PowerShell, type `sv.exe`, not `sv`.** PowerShell already uses `sv` as a short name for one of its own commands
-(`Set-Variable`), so plain `sv` there does nothing visible. In the older Command Prompt, plain `sv` works.
+**In PowerShell, type `stackvet` (or `sv.exe`), not `sv`.** PowerShell already uses `sv` as a short name for one of
+its own commands (`Set-Variable`), so plain `sv` there does nothing visible. Scoop installs the program under both
+names, so wherever StackVet's guide says `sv`, `stackvet` does the same. In the older Command Prompt, plain `sv` works
+too.
 
 To update later: `scoop update sv`.
 
