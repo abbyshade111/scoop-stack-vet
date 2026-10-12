@@ -37,9 +37,10 @@ jobs:
       - name: sv starts and checks an example app
         shell: pwsh
         run: |
-          sv --version
-          if ($LASTEXITCODE -ne 0) { Write-Error "sv --version exited $LASTEXITCODE"; exit 1 }
-          sv check stackvet\examples\flask-booking *> check.txt
+          # In PowerShell "sv" is its own alias for Set-Variable, so the program is typed as sv.exe there.
+          sv.exe --version
+          if ($LASTEXITCODE -ne 0) { Write-Error "sv.exe --version exited $LASTEXITCODE"; exit 1 }
+          sv.exe check stackvet\examples\flask-booking *> check.txt
           Get-Content check.txt -TotalCount 40
           if (-not (Select-String -Path check.txt -Pattern "Read " -Quiet)) { Write-Error "sv installed by Scoop did not read the example app"; exit 1 }
       - name: The manifest can follow the next release
@@ -53,15 +54,18 @@ jobs:
           scoop bucket add stackvet https://github.com/abbyshade111/scoop-stack-vet
           scoop info stackvet/sv
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          # And in the older Command Prompt, which has no such alias, plain sv works.
+          cmd /c "sv --version"
+          if ($LASTEXITCODE -ne 0) { Write-Error "plain sv in the Command Prompt exited $LASTEXITCODE"; exit 1 }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
       # What Scoop installed and where, and the program run without its shim, when anything above failed.
       - name: What was installed, when anything failed
         if: failure()
         shell: pwsh
         run: |
           scoop list
-          Get-Command sv -ErrorAction Continue | Format-List
+          Get-Command sv.exe -ErrorAction Continue | Format-List
           $dir = scoop prefix sv
           Get-ChildItem $dir | Select-Object Name, Length
-          Get-Content "$(Split-Path (Get-Command sv).Source)\sv.shim" -ErrorAction Continue
           & "$dir\sv.exe" --version
           "sv.exe exited $LASTEXITCODE"

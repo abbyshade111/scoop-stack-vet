@@ -12,8 +12,11 @@ In PowerShell:
 ```powershell
 scoop bucket add stackvet https://github.com/abbyshade111/scoop-stack-vet
 scoop install stackvet/sv
-sv --version
+sv.exe --version
 ```
+
+**In PowerShell, type `sv.exe`, not `sv`.** PowerShell already uses `sv` as a short name for one of its own commands
+(`Set-Variable`), so plain `sv` there does nothing visible. In the older Command Prompt, plain `sv` works.
 
 To update later: `scoop update sv`.
 
