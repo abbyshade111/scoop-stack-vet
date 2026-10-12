@@ -38,7 +38,7 @@ jobs:
         shell: pwsh
         run: |
           sv --version
-          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if ($LASTEXITCODE -ne 0) { Write-Error "sv --version exited $LASTEXITCODE"; exit 1 }
           sv check stackvet\examples\flask-booking *> check.txt
           Get-Content check.txt -TotalCount 40
           if (-not (Select-String -Path check.txt -Pattern "Read " -Quiet)) { Write-Error "sv installed by Scoop did not read the example app"; exit 1 }
@@ -53,3 +53,15 @@ jobs:
           scoop bucket add stackvet https://github.com/abbyshade111/scoop-stack-vet
           scoop info stackvet/sv
           if ($LASTEXITCODE -ne 0) { exit 1 }
+      # What Scoop installed and where, and the program run without its shim, when anything above failed.
+      - name: What was installed, when anything failed
+        if: failure()
+        shell: pwsh
+        run: |
+          scoop list
+          Get-Command sv -ErrorAction Continue | Format-List
+          $dir = scoop prefix sv
+          Get-ChildItem $dir | Select-Object Name, Length
+          Get-Content "$(Split-Path (Get-Command sv).Source)\sv.shim" -ErrorAction Continue
+          & "$dir\sv.exe" --version
+          "sv.exe exited $LASTEXITCODE"
