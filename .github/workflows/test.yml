@@ -27,11 +27,12 @@ jobs:
         run: |
           Invoke-Expression "& {$(Invoke-RestMethod https://get.scoop.sh)} -RunAsAdmin"
           Join-Path (Resolve-Path ~).Path "scoop\shims" >> $Env:GITHUB_PATH
-      - name: Use this checkout as the bucket, and install sv
+      # Scoop adds a bucket only from a git address, so the test installs from this checkout's manifest file itself,
+      # which is what "scoop install stackvet/sv" reads once the bucket is added.
+      - name: Install sv from this checkout's manifest
         shell: pwsh
         run: |
-          scoop bucket add stackvet "$Env:GITHUB_WORKSPACE\bucket-repo"
-          scoop install stackvet/sv
+          scoop install "$Env:GITHUB_WORKSPACE\bucket-repo\bucket\sv.json"
           if ($LASTEXITCODE -ne 0) { exit 1 }
       - name: sv starts and checks an example app
         shell: pwsh
@@ -45,4 +46,10 @@ jobs:
         shell: pwsh
         run: |
           & "$(scoop prefix scoop)\bin\checkver.ps1" -App sv -Dir "$Env:GITHUB_WORKSPACE\bucket-repo\bucket"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: The README's bucket address works
+        shell: pwsh
+        run: |
+          scoop bucket add stackvet https://github.com/abbyshade111/scoop-stack-vet
+          scoop info stackvet/sv
           if ($LASTEXITCODE -ne 0) { exit 1 }
