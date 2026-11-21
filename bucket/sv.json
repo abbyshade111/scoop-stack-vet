@@ -1,13 +1,13 @@
 {
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "StackVet: checks an app, written in any language, against the OWASP security standards, and says plainly what it checked and what it did not.",
     "homepage": "https://github.com/abbyshade111/StackVet",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/abbyshade111/StackVet/releases/download/v0.2.0/sv-0.2.0-windows-x86_64.zip",
-            "hash": "9bac9530269633d49b0698b68d43f4484d6abd3b93b2eb50548544f9e407ccc9",
-            "extract_dir": "sv-0.2.0-windows-x86_64"
+            "url": "https://github.com/abbyshade111/StackVet/releases/download/v0.3.0/sv-0.3.0-windows-x86_64.zip",
+            "hash": "5813e645f232369af19ff9dd95522743656af1c49d1d2de9a3e86d49faaea76e",
+            "extract_dir": "sv-0.3.0-windows-x86_64"
         }
     },
     "bin": [

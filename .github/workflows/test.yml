@@ -87,6 +87,31 @@ jobs:
           cmd /c "sv --version"
           if ($LASTEXITCODE -ne 0) { Write-Error "plain sv in the Command Prompt exited $LASTEXITCODE"; exit 1 }
           if ($LASTEXITCODE -ne 0) { exit 1 }
+      # ConfigVet's cv, from v0.3.0 (StackVet's backlog 0694), in this same job, so the one required check covers both
+      # manifests. PowerShell has no command named cv (StackVet's release workflow checks that on every change to it).
+      - name: Install cv from this checkout's manifest
+        shell: pwsh
+        run: |
+          scoop install "$Env:GITHUB_WORKSPACE\bucket-repo\bucket\cv.json"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: cv starts and reads a Dockerfile
+        shell: pwsh
+        run: |
+          cv --version
+          if ($LASTEXITCODE -ne 0) { Write-Error "cv --version exited $LASTEXITCODE"; exit 1 }
+          New-Item -ItemType Directory cv-app | Out-Null
+          Set-Content -Path cv-app\Dockerfile -Value "FROM node:24-alpine`nCMD [`"node`", `"index.js`"]"
+          # --no-tools: hadolint, Checkov, and Trivy are not on this runner; cv's own tests show each is said not run.
+          cv check cv-app --no-tools --out cv-report *> cv-check.txt
+          Get-Content cv-check.txt -TotalCount 40
+          if (-not (Select-String -Path cv-check.txt -Pattern "Read 1 deployment files" -Quiet)) { Write-Error "cv installed by Scoop did not read the Dockerfile"; exit 1 }
+          cmd /c "cv --version"
+          if ($LASTEXITCODE -ne 0) { Write-Error "plain cv in the Command Prompt exited $LASTEXITCODE"; exit 1 }
+      - name: cv's manifest can follow the next release
+        shell: pwsh
+        run: |
+          & "$(scoop prefix scoop)\bin\checkver.ps1" -App cv -Dir "$Env:GITHUB_WORKSPACE\bucket-repo\bucket"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
       # What Scoop installed and where, and the program run without its shim, when anything above failed.
       - name: What was installed, when anything failed
         if: failure()
