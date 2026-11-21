@@ -9,10 +9,36 @@ on:
     - cron: "41 6 * * 1"
 permissions:
   contents: read
+  # To read this job's own check run, for the name the ruleset knows it by.
+  checks: read
 jobs:
   install:
     runs-on: windows-latest
     steps:
+      # The "Protect main" ruleset requires this job by name, "install". Renamed, or split into a matrix (which adds
+      # its values to the name), it would not be required, and a manifest that fails could still merge. So the job
+      # reads its own name from its check run and fails when the rules for main do not require it.
+      # What this misses: a job removed from here stays required and never reports, so pull requests wait on it.
+      - name: This job is a required check on main
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECK_RUN_ID: ${{ job.check_run_id }}
+        run: |
+          if (-not $Env:CHECK_RUN_ID) { Write-Error "job.check_run_id is empty, so this job cannot look up its own name"; exit 1 }
+          $headers = @{ Authorization = "Bearer $Env:GH_TOKEN"; Accept = "application/vnd.github+json" }
+          $api = "https://api.github.com/repos/$Env:GITHUB_REPOSITORY"
+          $name = (Invoke-RestMethod -Headers $headers "$api/check-runs/$Env:CHECK_RUN_ID").name
+          $rules = Invoke-RestMethod -Headers $headers "$api/rules/branches/main"
+          $required = @($rules | Where-Object type -eq "required_status_checks" |
+            ForEach-Object { $_.parameters.required_status_checks.context })
+          "This job: $name"
+          "Required on main:"
+          $required | ForEach-Object { "  $_" }
+          if ($required -cnotcontains $name) {
+            Write-Error "The job `"$name`" is not a required check on main, so a pull request could merge without it. Add it to the `"Protect main`" ruleset's required checks, or give the job back a name the ruleset requires."
+            exit 1
+          }
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: bucket-repo

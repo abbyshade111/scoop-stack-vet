@@ -26,4 +26,5 @@ Each release's zip is signed where GitHub built it. To check it yourself, downlo
 and run `gh attestation verify <the zip> --repo abbyshade111/StackVet`.
 
 The check in `.github/workflows/test.yml` installs `sv` this way on Windows and runs a real check with it, on every
-change here and once a week.
+change here and once a week. The job first checks that `main`'s rules require it by its name, `install`, so a job
+renamed fails until the ruleset requires it too.
