@@ -33,9 +33,19 @@ cv --version
 PowerShell has no command of its own named `cv`, so plain `cv` works there. `cv check` also runs hadolint, Checkov, and
 Trivy where they are installed, and says so, with how to install each, where they are not.
 
+**AgentVet's `av`**, StackVet's companion that says what the records show an AI coding tool did while it built an
+app, and what it could not see, is here too, from StackVet v0.3.1:
+
+```powershell
+scoop install stackvet/av
+av --version
+```
+
+PowerShell has no command of its own named `av`, so plain `av` works there.
+
 Each release's zip is signed where GitHub built it. To check it yourself, download the zip from the release page
 and run `gh attestation verify <the zip> --repo abbyshade111/StackVet`.
 
-The check in `.github/workflows/test.yml` installs `sv` and `cv` this way on Windows and runs a real check with each, on every
+The check in `.github/workflows/test.yml` installs `sv`, `cv`, and `av` this way on Windows and runs a real check with each, on every
 change here and once a week. The job first checks that `main`'s rules require it by its name, `install`, so a job
 renamed fails until the ruleset requires it too.

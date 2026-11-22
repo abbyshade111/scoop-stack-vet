@@ -1,13 +1,13 @@
 {
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "ConfigVet (cv), StackVet's companion: reviews an app's deployment files (Dockerfiles, compose files, Kubernetes manifests, and Terraform plans) for unsafe and missing settings, and says plainly what it could not assess.",
     "homepage": "https://github.com/abbyshade111/StackVet",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/abbyshade111/StackVet/releases/download/v0.3.0/cv-0.3.0-windows-x86_64.zip",
-            "hash": "26c49e740f4a40da6b52d8c14a01d3ab845263a6325bccbfd2f5ba3a3bb529a5",
-            "extract_dir": "cv-0.3.0-windows-x86_64"
+            "url": "https://github.com/abbyshade111/StackVet/releases/download/v0.3.1/cv-0.3.1-windows-x86_64.zip",
+            "hash": "544d9ea1409782bd55e46957ece95caa1651ef955a5eb7df3fe3f8c7b0367bf2",
+            "extract_dir": "cv-0.3.1-windows-x86_64"
         }
     },
     "bin": [
