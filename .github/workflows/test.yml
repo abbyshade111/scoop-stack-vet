@@ -112,6 +112,32 @@ jobs:
         run: |
           & "$(scoop prefix scoop)\bin\checkver.ps1" -App cv -Dir "$Env:GITHUB_WORKSPACE\bucket-repo\bucket"
           if ($LASTEXITCODE -ne 0) { exit 1 }
+      # AgentVet's av, from v0.3.1 (StackVet's backlog 0724), in this same job too. PowerShell has no command named av
+      # (StackVet's release workflow checks that on every change to it).
+      - name: Install av from this checkout's manifest
+        shell: pwsh
+        run: |
+          scoop install "$Env:GITHUB_WORKSPACE\bucket-repo\bucket\av.json"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: av starts and reports on an empty folder
+        shell: pwsh
+        run: |
+          av --version
+          if ($LASTEXITCODE -ne 0) { Write-Error "av --version exited $LASTEXITCODE"; exit 1 }
+          # A folder with nothing about a tool: av says what it did not look at, and exits 2.
+          New-Item -ItemType Directory av-app | Out-Null
+          av report av-app *> av-report.txt
+          $code = $LASTEXITCODE
+          Get-Content av-report.txt -TotalCount 40
+          if ($code -ne 2) { Write-Error "av report of an empty folder exited $code, not 2"; exit 1 }
+          if (-not (Select-String -Path av-report.txt -Pattern "Not looked at" -Quiet)) { Write-Error "av installed by Scoop did not say what it did not look at"; exit 1 }
+          cmd /c "av --version"
+          if ($LASTEXITCODE -ne 0) { Write-Error "plain av in the Command Prompt exited $LASTEXITCODE"; exit 1 }
+      - name: av's manifest can follow the next release
+        shell: pwsh
+        run: |
+          & "$(scoop prefix scoop)\bin\checkver.ps1" -App av -Dir "$Env:GITHUB_WORKSPACE\bucket-repo\bucket"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
       # What Scoop installed and where, and the program run without its shim, when anything above failed.
       - name: What was installed, when anything failed
         if: failure()
